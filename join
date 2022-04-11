@@ -4,6 +4,7 @@ import sys
 
 
 def generate_header(first_csv: str, second_csv: str, column_name: str):
+    """Generating header of new csv file."""
     with open(first_csv, 'r') as first_file:
         with open(second_csv, 'r') as second_file:
             first_file_cols = list(csv.DictReader(first_file).fieldnames)
@@ -15,6 +16,7 @@ def generate_header(first_csv: str, second_csv: str, column_name: str):
 
 
 def inner_join(first_csv: str, second_csv: str, column_name: str):
+    """Implementation of inner join. Prints every joined row."""
     with open(first_csv, 'r') as first_file:
         first_iterator = csv.DictReader(first_file)
         for first_file_row in first_iterator:
@@ -30,6 +32,9 @@ def inner_join(first_csv: str, second_csv: str, column_name: str):
 
 
 def fill_missing(left_file_row, right_file_row, join_type, column_name):
+    """
+    Generating joined row filled with nulls on side specified with join_type parameter.
+    """
     if join_type == 'left':
         print(','.join(left_file_row.values()) + ',' * (len(right_file_row) - 1))
     elif join_type == 'right':
@@ -42,6 +47,10 @@ def fill_missing(left_file_row, right_file_row, join_type, column_name):
 
 
 def left_join(left_csv: str, right_csv: str, column_name: str):
+    """
+    Implementation of left join. Prints every joined row.
+    If no row was matched to the row of left file it calls fill_missing() function.
+    """
     with open(left_csv, 'r') as left_file:
         left_iterator = csv.DictReader(left_file)
         for left_file_row in left_iterator:
@@ -61,6 +70,10 @@ def left_join(left_csv: str, right_csv: str, column_name: str):
 
 
 def right_join(left_csv: str, right_csv: str, column_name: str):
+    """
+    Implementation of right join. Prints every joined row.
+    If no row was matched to the row of right file it calls fill_missing() function.
+    """
     with open(right_csv, 'r') as right_file:
         right_iterator = csv.DictReader(right_file)
         for right_file_row in right_iterator:
@@ -80,12 +93,17 @@ def right_join(left_csv: str, right_csv: str, column_name: str):
 
 
 def column_exist(file_header, column_name):
+    """Function that checks if column name you want to join files on is present in the file header."""
     if column_name not in file_header:
         return False
     return True
 
 
 def valid_csv(file_name, column_name):
+    """
+    Function that checks if column number in every row is constant, column name you want to join on is present in
+    file header and file exists. It calls column_exist() function.
+    """
     try:
         with open(file_name, 'r') as first_file:
             file_iterator = csv.DictReader(first_file)
@@ -104,12 +122,23 @@ def valid_csv(file_name, column_name):
 
 
 def files_fine(first_file, second_file, column_name):
+    """
+    Functions that checks with valid_csv() function if files given:
+    -exist
+    -are valid csv files
+    -have column you want to join files on
+    Returns True or False depending on check result for both files.
+    """
     if not valid_csv(first_file, column_name) or not valid_csv(second_file, column_name):
         return False
     return True
 
 
 def validate_arguments(argv):
+    """
+    Function that is validating parameters given to join(). It calls files_fine() function and returns True if
+    parameters are valid or False if they are not.
+    """
     if len(argv) < 4:
         print('ERROR! Not enough parameters.', file=sys.stderr)
         return False
@@ -119,6 +148,14 @@ def validate_arguments(argv):
 
 
 def join(argv):
+    """
+    argv - list of arguments given to the program via terminal
+    argv[1] - first file path
+    argv[2] - second file path
+    argv[3] - column name to join files on
+    argv[4] - join type, if not specified default type is inner join
+    Main part of the program that calls other functions.
+    """
     if validate_arguments(argv):
         first_csv = argv[1]
         second_csv = argv[2]
@@ -138,5 +175,5 @@ def join(argv):
             print('ERROR! Wrong join type was given. Possible types are inner/left/right.', file=sys.stderr)
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # making module executable itself
     join(sys.argv)
